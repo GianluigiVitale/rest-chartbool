@@ -62,7 +62,7 @@ $(document).ready(function () {
                 venditori.push(key);
                 percentualeVenditeVenditore.push(oggettoVenditori2017[key]);
             }
-            chartJsVenditoriPercentuale()
+            chartJsVenditoriPercentuale();
         }
     });
 
