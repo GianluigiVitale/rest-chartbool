@@ -9,15 +9,40 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js" integrity="sha256-4iQZ6BVL4qNKlQ27TExEhBN1HFPvAvAMbFavKKosSWQ=" crossorigin="anonymous"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/locale/it.js" integrity="sha256-D8y560ZGsKY1LoAajKkQCG7y0Vkye361MH4yFv2K5kk=" crossorigin="anonymous"></script>
-        <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.4/handlebars.min.js" charset="utf-8"></script> -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.7.4/handlebars.min.js" charset="utf-8"></script>
         <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     </head>
     <body>
-
-        <div class="container">
+        <div class="select">
+            <select class="venditore-select">      <!-- Grazie a handlebars vengono inseriti i nomi dei venditori -->
+                <option value="">Seleziona Venditore:</option>
+            </select>
+            <select class="mese-select">        <!-- SELECT con i mesi dell'anno -->
+                <option value="">Seleziona Mese:</option>
+                <option value="01">Gennaio</option>
+                <option value="02">Febbraio</option>
+                <option value="03">Marzo</option>
+                <option value="04">Aprile</option>
+                <option value="05">Maggio</option>
+                <option value="06">Giugno</option>
+                <option value="07">Luglio</option>
+                <option value="08">Agosto</option>
+                <option value="09">Settembre</option>
+                <option value="10">Ottobre</option>
+                <option value="11">Novembre</option>
+                <option value="12">Dicembre</option>
+            </select>
+            <input class="input-vendita" type="text" placeholder="Inserisci Valore Vendita" value="">
+            <button type="button" class="invio-dati">INVIO DATI</button>
+        </div>
+        <div class="container">     <!-- Contiene i due grafici creati grazie a chart JS -->
             <canvas id="numero-vendite-2017"></canvas>
             <canvas id="contributo-venditori-2017"></canvas>
         </div>
+
+        <script id="template-venditori" type="text/x-handlebars-template">      <!-- TEMPLATE HANDLEBARS per creare inserire i nomi dei venditori nel select -->
+            <option value="{{nomeVenditore}}">{{nomeVenditore}}</option>
+        </script>
 
 
         <script src="js/main.js"></script>

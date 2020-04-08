@@ -6,10 +6,19 @@
 
 body {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
 }
 
+.select {
+    padding-top: 50px;
+}
+
 .container {
     width: 60vw;
+}
+
+canvas {
+    margin: 50px 0;
 }
