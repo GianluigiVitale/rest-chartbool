@@ -20,6 +20,8 @@ $(document).ready(function () {
             }),
             success: function() {
                 ajaxDatiEGrafici();
+                // window.myPieChart.update();
+                // window.chartSales.update();
             },
             error: function() {
                 alert('errore')
@@ -76,8 +78,12 @@ $(document).ready(function () {
                     totaleVendite2017 = nuoviDati.totaleVendite2017;
                 }
 
-                arrayGrafVenditeMese(oggettoVenditeMese, lables, venditeMese);
-                arrayGrafPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeVenditeVenditore, totaleVendite2017);
+                arrayVenditeMese(oggettoVenditeMese, lables, venditeMese);
+                arrayPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeVenditeVenditore, totaleVendite2017);
+
+                chartJsVendite(lables, venditeMese)
+                chartJsVenditoriPercentuale(venditori, percentualeVenditeVenditore);
+                
                 handlebarsNomeVenditori(venditori);
             },
             error: function() {
@@ -91,16 +97,14 @@ $(document).ready(function () {
     // grafico 1 vendite mese per mese 2017
     function datiVenditePerMese2017(dataSingolo, oggettoVenditeMese) {     // ottengo i dati delle vendite per ogni mese
         var giornoVenditaSingolo = dataSingolo.date;
-        var momentMeseAttuale = moment(giornoVenditaSingolo, "DD-MM-YYYY");
-        var giornoX = momentMeseAttuale.clone();
-        var nomeMese = giornoX.format('MMMM');
+        var nomeMese = moment(giornoVenditaSingolo, "DD/MM/YYYY").format('MMMM');
 
         oggettoVenditeMese[nomeMese] += dataSingolo.amount;
 
         return oggettoVenditeMese;
     }
 
-    function arrayGrafVenditeMese(oggettoVenditeMese, lables, venditeMese) {       // inserisco in due array diversi le chiavi e i rispettivi valori dell'oggetto 'oggettoVenditeMese'
+    function arrayVenditeMese(oggettoVenditeMese, lables, venditeMese) {       // inserisco in due array diversi le chiavi e i rispettivi valori dell'oggetto 'oggettoVenditeMese'
         for (var key in oggettoVenditeMese) {
             lables.push(key);
             venditeMese.push(oggettoVenditeMese[key])
@@ -142,7 +146,7 @@ $(document).ready(function () {
         }
     }
 
-    function arrayGrafPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeVenditeVenditore, totaleVendite2017) {       // trasformo il valore delle chiavi (rappresentato dalle vendite di ogni venditore) nella percentuale di vendite annuali che ha prodotto E inserisco in due array diversi la chiave e il rispettivo valore
+    function arrayPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeVenditeVenditore, totaleVendite2017) {       // trasformo il valore delle chiavi (rappresentato dalle vendite di ogni venditore) nella percentuale di vendite annuali che ha prodotto E inserisco in due array diversi la chiave e il rispettivo valore
         for (var key in oggettoVenditori2017) {
             oggettoVenditori2017[key] = Math.round(oggettoVenditori2017[key] / totaleVendite2017 * 100);
             venditori.push(key);
