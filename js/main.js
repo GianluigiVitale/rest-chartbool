@@ -20,8 +20,6 @@ $(document).ready(function () {
             }),
             success: function() {
                 ajaxDatiGrafici();
-                // window.myPieChart.update();
-                // window.chartSales.update();
             },
             error: function() {
                 alert('errore')
@@ -36,6 +34,7 @@ $(document).ready(function () {
 
 
     function ajaxDatiGrafici() {       // creo i due grafici (vendite mese per mese 2017 e performance venditori 2017)
+        removeCanvasAndSalesman();
 
         //  oggetto e array vuoti che verranno popolati grazie alla chiamata ajax
         var oggettoFatturatoMese = {
@@ -173,6 +172,13 @@ $(document).ready(function () {
                 title: {
                     display: true,
                     text: 'Vendite di ogni venditore rispetto al totale (Espresse in percentuale %)'
+                },
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            return data['labels'][tooltipItem['index']] + ': ' + data['datasets'][0]['data'][tooltipItem['index']] + '%';
+                        }
+                    }
                 }
             }
         });
@@ -219,6 +225,13 @@ $(document).ready(function () {
             }
         }
 
+    }
+
+
+    function removeCanvasAndSalesman() {       // svuota il contenitore dei canvas e ricrea i canvas, svuota la lista dei venditori
+        $('.container').empty();
+        $('.container').append('<canvas id="numero-vendite-2017"></canvas><canvas id="contributo-venditori-2017"></canvas>');
+        $('.venditore-select option').not(':first').remove();
     }
 
 
