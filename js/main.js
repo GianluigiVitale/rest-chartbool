@@ -19,7 +19,7 @@ $(document).ready(function () {
                 date: nuovaVendita.dataMeseSelezionato
             }),
             success: function() {
-                ajaxDatiEGrafici();
+                ajaxDatiGrafici();
                 // window.myPieChart.update();
                 // window.chartSales.update();
             },
