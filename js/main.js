@@ -60,8 +60,16 @@ $(document).ready(function () {
         var oggettoVenditori2017 = {};
         var venditori = [];
         var percentualeFatturatoVenditore = [];
-        // fine cose vuote
 
+            //terzo grafico
+        var oggettoFatturatoQuarter = {
+            q1: 0,
+            q2: 0,
+            q3: 0,
+            q4: 0
+        }
+        var fatturatoQuarter = [];
+        // fine cose vuote
 
 
         $.ajax({
@@ -75,13 +83,16 @@ $(document).ready(function () {
                     var nuoviDati = datiPerformanceVenditori2017(dataSingolo, oggettoVenditori2017, fatturato2017);
                     oggettoVenditori2017 = nuoviDati.oggettoVenditori2017;
                     fatturato2017 = nuoviDati.fatturato2017;
+                    oggettoFatturatoQuarter = datiFatturatoQuarter(dataSingolo, oggettoFatturatoQuarter);
+                    
                 }
-
                 arrayfatturatoMese(oggettoFatturatoMese, lables, fatturatoMese);
                 arrayPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeFatturatoVenditore, fatturato2017);
+                arrayFatturatoQuarter(oggettoFatturatoQuarter, fatturatoQuarter);
 
                 chartJsVendite(lables, fatturatoMese);
                 chartJsVenditoriPercentuale(venditori, percentualeFatturatoVenditore);
+                chartJsFatturatoQuarter(fatturatoQuarter);
 
                 handlebarsNomeVenditori(venditori);
             },
@@ -113,7 +124,7 @@ $(document).ready(function () {
     }
 
     function chartJsVendite(lables, fatturatoMese) {     // funzione che serve per creare grafico delle vendite di ogni mese dell'anno 2017 grazie a chart js
-        var chartSalesX = $('#numero-vendite-2017');
+        var chartSalesX = $('#fatturato-mese-2017');
         var chartSales = new Chart(chartSalesX, {
             type: 'line',
             data: {
@@ -155,7 +166,7 @@ $(document).ready(function () {
     }
 
     function chartJsVenditoriPercentuale(venditori, percentualeFatturatoVenditore) {    // funzione che serve per creare grafico delle vendite di ogni venditore dell'anno 2017 grazie a chart js
-        var ctx = $('#contributo-venditori-2017');
+        var ctx = $('#fatturato-venditori-2017');
         var myPieChart = new Chart(ctx, {
             type: 'pie',
             data: {
@@ -184,6 +195,40 @@ $(document).ready(function () {
         });
     }
     // fine grafico 2
+
+
+    // grafico 3 fatturato quarters 2017
+    function datiFatturatoQuarter(dataSingolo, oggettoFatturatoQuarter) {   // ottengo il fatturato di ogni quarter del 2017
+        var giornoVenditaSingolo = dataSingolo.date;
+        var numeroQuarter = moment(giornoVenditaSingolo, "DD/MM/YYYY").quarter();
+        var chiaveOggFattQuarter = 'q' + numeroQuarter;
+        oggettoFatturatoQuarter[chiaveOggFattQuarter] += dataSingolo.amount;
+
+        return oggettoFatturatoQuarter;
+    }
+
+    function arrayFatturatoQuarter(oggettoFatturatoQuarter, fatturatoQuarter) {     // trasformo il valore delle chiavi nel fatturato di quel rispettivo trimestre
+        for (var key in oggettoFatturatoQuarter) {
+            fatturatoQuarter.push(oggettoFatturatoQuarter[key]);
+        }
+    }
+
+    function chartJsFatturatoQuarter(fatturatoQuarter) {    // questa funzione crea il grafico del fatturato per quarter grazie a chartjs
+        var ctx1 = $('#fatturato-quarters-2017');
+        var myBarChart = new Chart(ctx1, {
+            type: 'bar',
+            data: {
+                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                datasets: [{
+                    label: 'Fatturato per Quarter 2017',
+                    backgroundColor: '#2E4691',
+                    borderColor: '#2E4691',
+                    data: fatturatoQuarter
+                }]
+            }
+        });
+    }
+    // fine grafico 3
 
 
     function handlebarsNomeVenditori(venditori) {       // funzione che prende l'array venditori e grazie a handlebars inserisce il loro nome come opzione nel select 'venditore-select'
@@ -230,7 +275,11 @@ $(document).ready(function () {
 
     function removeCanvasAndSalesman() {       // svuota il contenitore dei canvas e ricrea i canvas, svuota la lista dei venditori
         $('.container').empty();
-        $('.container').append('<canvas id="numero-vendite-2017"></canvas><canvas id="contributo-venditori-2017"></canvas>');
+        $('.container1').empty();
+
+        $('.container').append('<canvas id="fatturato-mese-2017"></canvas><canvas id="fatturato-venditori-2017"></canvas>');
+        $('.container1').append('<canvas id="fatturato-quarters-2017"></canvas>');
+
         $('.venditore-select option').not(':first').remove();
     }
 

@@ -15,7 +15,7 @@ body {
     padding-top: 50px;
 }
 
-.container {
+.container, .container1 {
     width: 60vw;
 }
 
