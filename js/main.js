@@ -81,7 +81,7 @@ $(document).ready(function () {
                 arrayfatturatoMese(oggettoFatturatoMese, lables, fatturatoMese);
                 arrayPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeFatturatoVenditore, fatturato2017);
 
-                chartJsVendite(lables, fatturatoMese)
+                chartJsVendite(lables, fatturatoMese);
                 chartJsVenditoriPercentuale(venditori, percentualeFatturatoVenditore);
 
                 handlebarsNomeVenditori(venditori);
@@ -197,14 +197,28 @@ $(document).ready(function () {
         var dataMeseSelezionato = "01/" + meseSelezionato + "/2017";
         var valoreVendita = parseInt($('.input-vendita').val());
 
-        $('.venditore-select, .mese-select').val($('select option:first').val());
-        $('.input-vendita').val('')
 
-        return {
-            venditoreSelezionato: venditoreSelezionato,
-            dataMeseSelezionato: dataMeseSelezionato,
-            valoreVendita: valoreVendita
+        if (venditoreSelezionato == '') {
+            alert('Perfavore Seleziona un Venditore');
         }
+        if (meseSelezionato == '') {
+            alert('Perfavore Seleziona un Mese');
+        }
+        if (isNaN(valoreVendita)) {
+            alert('Perfavore Inserisci un numero');
+        }
+
+        if ((venditoreSelezionato != '') && (meseSelezionato != '') && (!isNaN(valoreVendita))) {
+            $('.venditore-select, .mese-select').val($('select option:first').val());
+            $('.input-vendita').val('')
+
+            return {
+                venditoreSelezionato: venditoreSelezionato,
+                dataMeseSelezionato: dataMeseSelezionato,
+                valoreVendita: valoreVendita
+            }
+        }
+
     }
 
 
