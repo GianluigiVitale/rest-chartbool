@@ -36,7 +36,7 @@ $(document).ready(function () {
     function ajaxDatiGrafici() {       // creo i due grafici (vendite mese per mese 2017 e performance venditori 2017)
         removeCanvasAndSalesman();
 
-        //  oggetto e array vuoti che verranno popolati grazie alla chiamata ajax
+        //  oggetto e variabile vuoti che verranno popolati grazie alla chiamata ajax
         var oggettoFatturatoMese = {
             gennaio: 0,
             febbraio: 0,
@@ -51,15 +51,11 @@ $(document).ready(function () {
             novembre: 0,
             dicembre: 0,
         };
-        var lables = [];
-        var fatturatoMese = [];
             // fine primo grafico
 
             // secondo grafico
         var fatturato2017 = 0;
         var oggettoVenditori2017 = {};
-        var venditori = [];
-        var percentualeFatturatoVenditore = [];
 
             //terzo grafico
         var oggettoFatturatoQuarter = {
@@ -68,7 +64,6 @@ $(document).ready(function () {
             q3: 0,
             q4: 0
         }
-        var fatturatoQuarter = [];
         // fine cose vuote
 
 
@@ -79,18 +74,24 @@ $(document).ready(function () {
                 for (var i = 0; i < data.length; i++) {     // con questo ciclo for popolo l'oggetto 'oggettoFatturatoMese'. Le CHIAVI sono i mesi dell'anno e i VALORI le vendite totali per quel mese. E popolo anche l'oggetto 'oggettoVenditori2017'. Le CHIAVI sono i nomi dei venditori e i VALORI (fatturato del venditore / fatturato totale) * 100
                     var dataSingolo = data[i];
 
-                    oggettoFatturatoMese = datiVenditePerMese2017(dataSingolo, oggettoFatturatoMese);
+                    oggettoFatturatoMese = datiVenditePerMese2017(dataSingolo, oggettoFatturatoMese);                   // riga 77,78 e 80 mi estrapolo i dati per popolare i 3 oggetti e la variabile fatturato2017
                     var nuoviDati = datiPerformanceVenditori2017(dataSingolo, oggettoVenditori2017, fatturato2017);
-                    oggettoVenditori2017 = nuoviDati.oggettoVenditori2017;
-                    fatturato2017 = nuoviDati.fatturato2017;
+                        oggettoVenditori2017 = nuoviDati.oggettoVenditori2017;
+                        fatturato2017 = nuoviDati.fatturato2017;
                     oggettoFatturatoQuarter = datiFatturatoQuarter(dataSingolo, oggettoFatturatoQuarter);
-                    
-                }
-                arrayfatturatoMese(oggettoFatturatoMese, lables, fatturatoMese);
-                arrayPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeFatturatoVenditore, fatturato2017);
-                arrayFatturatoQuarter(oggettoFatturatoQuarter, fatturatoQuarter);
 
-                chartJsVendite(lables, fatturatoMese);
+                }
+                var oggettoMesiEFatturato = arrayfatturatoMese(oggettoFatturatoMese);               // riga 84, 88 e 92 inserisco i dati degli oggetti in degli array
+                    var lables = oggettoMesiEFatturato.lables;
+                    var fatturatoMese = oggettoMesiEFatturato.fatturatoMese;
+
+                var oggettoFattVenditori = arrayPerformanceVenditori2017(oggettoVenditori2017, fatturato2017);
+                    var venditori = oggettoFattVenditori.venditori;
+                    var percentualeFatturatoVenditore = oggettoFattVenditori.percentualeFatturatoVenditore;
+
+                var fatturatoQuarter = arrayFatturatoQuarter(oggettoFatturatoQuarter, fatturatoQuarter);
+
+                chartJsVendite(lables, fatturatoMese);              // riga 94,95,96 creo i grafici grazie ai dati estrapolati sopra
                 chartJsVenditoriPercentuale(venditori, percentualeFatturatoVenditore);
                 chartJsFatturatoQuarter(fatturatoQuarter);
 
@@ -114,13 +115,20 @@ $(document).ready(function () {
         return oggettoFatturatoMese;
     }
 
-    function arrayfatturatoMese(oggettoFatturatoMese, lables, fatturatoMese) {       // inserisco in due array diversi le chiavi e i rispettivi valori dell'oggetto 'oggettoFatturatoMese'
+    function arrayfatturatoMese(oggettoFatturatoMese) {       // inserisco in due array diversi le chiavi e i rispettivi valori dell'oggetto 'oggettoFatturatoMese'
+        var lables = [];
+        var fatturatoMese = [];
+
         for (var key in oggettoFatturatoMese) {
             lables.push(key);
             fatturatoMese.push(oggettoFatturatoMese[key])
         }
         maiuscoloPrimaLetteraArray(lables);
-        // chartJsVendite(lables, fatturatoMese);
+
+        return {
+            lables: lables,
+            fatturatoMese: fatturatoMese
+        }
     }
 
     function chartJsVendite(lables, fatturatoMese) {     // funzione che serve per creare grafico delle vendite di ogni mese dell'anno 2017 grazie a chart js
@@ -156,13 +164,20 @@ $(document).ready(function () {
         }
     }
 
-    function arrayPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeFatturatoVenditore, fatturato2017) {       // trasformo il valore delle chiavi (rappresentato dalle vendite di ogni venditore) nella percentuale di vendite annuali che ha prodotto E inserisco in due array diversi la chiave e il rispettivo valore
+    function arrayPerformanceVenditori2017(oggettoVenditori2017, fatturato2017) {       // trasformo il valore delle chiavi (rappresentato dalle vendite di ogni venditore) nella percentuale di vendite annuali che ha prodotto E inserisco in due array diversi la chiave e il rispettivo valore
+        var venditori = [];
+        var percentualeFatturatoVenditore = [];
+
         for (var key in oggettoVenditori2017) {
             oggettoVenditori2017[key] = Math.round(oggettoVenditori2017[key] / fatturato2017 * 100);
             venditori.push(key);
             percentualeFatturatoVenditore.push(oggettoVenditori2017[key]);
         }
-        // chartJsVenditoriPercentuale(venditori, percentualeFatturatoVenditore);
+
+        return {
+            venditori: venditori,
+            percentualeFatturatoVenditore: percentualeFatturatoVenditore
+        }
     }
 
     function chartJsVenditoriPercentuale(venditori, percentualeFatturatoVenditore) {    // funzione che serve per creare grafico delle vendite di ogni venditore dell'anno 2017 grazie a chart js
@@ -208,9 +223,13 @@ $(document).ready(function () {
     }
 
     function arrayFatturatoQuarter(oggettoFatturatoQuarter, fatturatoQuarter) {     // trasformo il valore delle chiavi nel fatturato di quel rispettivo trimestre
+        var fatturatoQuarter = [];
+
         for (var key in oggettoFatturatoQuarter) {
             fatturatoQuarter.push(oggettoFatturatoQuarter[key]);
         }
+
+        return fatturatoQuarter;
     }
 
     function chartJsFatturatoQuarter(fatturatoQuarter) {    // questa funzione crea il grafico del fatturato per quarter grazie a chartjs
