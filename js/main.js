@@ -3,7 +3,7 @@ $(document).ready(function () {
     var source = $("#template-venditori").html();   // handlebars
     var template = Handlebars.compile(source);
 
-    ajaxDatiEGrafici();
+    ajaxDatiGrafici();
 
 
     $('.invio-dati').click(function () {
@@ -35,10 +35,10 @@ $(document).ready(function () {
 
 
 
-    function ajaxDatiEGrafici() {       // creo i due grafici (vendite mese per mese 2017 e performance venditori 2017)
+    function ajaxDatiGrafici() {       // creo i due grafici (vendite mese per mese 2017 e performance venditori 2017)
 
         //  oggetto e array vuoti che verranno popolati grazie alla chiamata ajax
-        var oggettoVenditeMese = {
+        var oggettoFatturatoMese = {
             gennaio: 0,
             febbraio: 0,
             marzo: 0,
@@ -53,14 +53,14 @@ $(document).ready(function () {
             dicembre: 0,
         };
         var lables = [];
-        var venditeMese = [];
+        var fatturatoMese = [];
             // fine primo grafico
 
             // secondo grafico
-        var totaleVendite2017 = 0;
+        var fatturato2017 = 0;
         var oggettoVenditori2017 = {};
         var venditori = [];
-        var percentualeVenditeVenditore = [];
+        var percentualeFatturatoVenditore = [];
         // fine cose vuote
 
 
@@ -69,21 +69,21 @@ $(document).ready(function () {
             url: 'http://157.230.17.132:4034/sales',
             method: 'GET',
             success: function (data) {
-                for (var i = 0; i < data.length; i++) {     // con questo ciclo for popolo l'oggetto 'oggettoVenditeMese'. Le CHIAVI sono i mesi dell'anno e i VALORI le vendite totali per quel mese. E popolo anche l'oggetto 'oggettoVenditori2017'. Le CHIAVI sono i nomi dei venditori e i VALORI (fatturato del venditore / fatturato totale) * 100
+                for (var i = 0; i < data.length; i++) {     // con questo ciclo for popolo l'oggetto 'oggettoFatturatoMese'. Le CHIAVI sono i mesi dell'anno e i VALORI le vendite totali per quel mese. E popolo anche l'oggetto 'oggettoVenditori2017'. Le CHIAVI sono i nomi dei venditori e i VALORI (fatturato del venditore / fatturato totale) * 100
                     var dataSingolo = data[i];
 
-                    oggettoVenditeMese = datiVenditePerMese2017(dataSingolo, oggettoVenditeMese);
-                    var nuoviDati = datiPerformanceVenditori2017(dataSingolo, oggettoVenditori2017, totaleVendite2017);
+                    oggettoFatturatoMese = datiVenditePerMese2017(dataSingolo, oggettoFatturatoMese);
+                    var nuoviDati = datiPerformanceVenditori2017(dataSingolo, oggettoVenditori2017, fatturato2017);
                     oggettoVenditori2017 = nuoviDati.oggettoVenditori2017;
-                    totaleVendite2017 = nuoviDati.totaleVendite2017;
+                    fatturato2017 = nuoviDati.fatturato2017;
                 }
 
-                arrayVenditeMese(oggettoVenditeMese, lables, venditeMese);
-                arrayPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeVenditeVenditore, totaleVendite2017);
+                arrayfatturatoMese(oggettoFatturatoMese, lables, fatturatoMese);
+                arrayPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeFatturatoVenditore, fatturato2017);
 
-                chartJsVendite(lables, venditeMese)
-                chartJsVenditoriPercentuale(venditori, percentualeVenditeVenditore);
-                
+                chartJsVendite(lables, fatturatoMese)
+                chartJsVenditoriPercentuale(venditori, percentualeFatturatoVenditore);
+
                 handlebarsNomeVenditori(venditori);
             },
             error: function() {
@@ -95,25 +95,25 @@ $(document).ready(function () {
 
 
     // grafico 1 vendite mese per mese 2017
-    function datiVenditePerMese2017(dataSingolo, oggettoVenditeMese) {     // ottengo i dati delle vendite per ogni mese
+    function datiVenditePerMese2017(dataSingolo, oggettoFatturatoMese) {     // ottengo i dati delle vendite per ogni mese
         var giornoVenditaSingolo = dataSingolo.date;
         var nomeMese = moment(giornoVenditaSingolo, "DD/MM/YYYY").format('MMMM');
 
-        oggettoVenditeMese[nomeMese] += dataSingolo.amount;
+        oggettoFatturatoMese[nomeMese] += dataSingolo.amount;
 
-        return oggettoVenditeMese;
+        return oggettoFatturatoMese;
     }
 
-    function arrayVenditeMese(oggettoVenditeMese, lables, venditeMese) {       // inserisco in due array diversi le chiavi e i rispettivi valori dell'oggetto 'oggettoVenditeMese'
-        for (var key in oggettoVenditeMese) {
+    function arrayfatturatoMese(oggettoFatturatoMese, lables, fatturatoMese) {       // inserisco in due array diversi le chiavi e i rispettivi valori dell'oggetto 'oggettoFatturatoMese'
+        for (var key in oggettoFatturatoMese) {
             lables.push(key);
-            venditeMese.push(oggettoVenditeMese[key])
+            fatturatoMese.push(oggettoFatturatoMese[key])
         }
         maiuscoloPrimaLetteraArray(lables);
-        chartJsVendite(lables, venditeMese);
+        // chartJsVendite(lables, fatturatoMese);
     }
 
-    function chartJsVendite(lables, venditeMese) {     // funzione che serve per creare grafico delle vendite di ogni mese dell'anno 2017 grazie a chart js
+    function chartJsVendite(lables, fatturatoMese) {     // funzione che serve per creare grafico delle vendite di ogni mese dell'anno 2017 grazie a chart js
         var chartSalesX = $('#numero-vendite-2017');
         var chartSales = new Chart(chartSalesX, {
             type: 'line',
@@ -123,7 +123,7 @@ $(document).ready(function () {
                     label: 'Vendite Mese per Mese 2017',
                     backgroundColor: '#2E4691',
                     borderColor: '#2E4691',
-                    data: venditeMese
+                    data: fatturatoMese
                 }]
             }
         });
@@ -132,36 +132,36 @@ $(document).ready(function () {
 
 
     // grafico 2 performace venditori 2017
-    function datiPerformanceVenditori2017(dataSingolo, oggettoVenditori2017, totaleVendite2017) {      // ottengo la performance (fatturato del venditore / fatturato totale) di ogni venditore nell'anno 2017
+    function datiPerformanceVenditori2017(dataSingolo, oggettoVenditori2017, fatturato2017) {      // ottengo la performance (fatturato del venditore / fatturato totale) di ogni venditore nell'anno 2017
         var nomeVenditore = dataSingolo.salesman;
         if (oggettoVenditori2017[nomeVenditore] === undefined) {
             oggettoVenditori2017[nomeVenditore] = 0;
         }
         oggettoVenditori2017[nomeVenditore] += dataSingolo.amount;
-        totaleVendite2017 += dataSingolo.amount;
+        fatturato2017 += dataSingolo.amount;
 
         return {
             oggettoVenditori2017: oggettoVenditori2017,
-            totaleVendite2017: totaleVendite2017
+            fatturato2017: fatturato2017
         }
     }
 
-    function arrayPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeVenditeVenditore, totaleVendite2017) {       // trasformo il valore delle chiavi (rappresentato dalle vendite di ogni venditore) nella percentuale di vendite annuali che ha prodotto E inserisco in due array diversi la chiave e il rispettivo valore
+    function arrayPerformanceVenditori2017(oggettoVenditori2017, venditori, percentualeFatturatoVenditore, fatturato2017) {       // trasformo il valore delle chiavi (rappresentato dalle vendite di ogni venditore) nella percentuale di vendite annuali che ha prodotto E inserisco in due array diversi la chiave e il rispettivo valore
         for (var key in oggettoVenditori2017) {
-            oggettoVenditori2017[key] = Math.round(oggettoVenditori2017[key] / totaleVendite2017 * 100);
+            oggettoVenditori2017[key] = Math.round(oggettoVenditori2017[key] / fatturato2017 * 100);
             venditori.push(key);
-            percentualeVenditeVenditore.push(oggettoVenditori2017[key]);
+            percentualeFatturatoVenditore.push(oggettoVenditori2017[key]);
         }
-        chartJsVenditoriPercentuale(venditori, percentualeVenditeVenditore);
+        // chartJsVenditoriPercentuale(venditori, percentualeFatturatoVenditore);
     }
 
-    function chartJsVenditoriPercentuale(venditori, percentualeVenditeVenditore) {    // funzione che serve per creare grafico delle vendite di ogni venditore dell'anno 2017 grazie a chart js
+    function chartJsVenditoriPercentuale(venditori, percentualeFatturatoVenditore) {    // funzione che serve per creare grafico delle vendite di ogni venditore dell'anno 2017 grazie a chart js
         var ctx = $('#contributo-venditori-2017');
         var myPieChart = new Chart(ctx, {
             type: 'pie',
             data: {
                 datasets: [{
-                    data: percentualeVenditeVenditore,
+                    data: percentualeFatturatoVenditore,
                     backgroundColor: ['#309FDB', '#E95B54', '#FBCE4A', '#3CAF85']
                 }],
                 labels: venditori
