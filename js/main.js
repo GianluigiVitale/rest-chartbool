@@ -34,7 +34,7 @@ $(document).ready(function () {
 
 
     function ajaxDatiGrafici() {       // creo i due grafici (vendite mese per mese 2017 e performance venditori 2017)
-        removeCanvasAndSalesman();
+        removeSalesman();
 
         //  oggetto e variabile vuoti che verranno popolati grazie alla chiamata ajax
         var oggettoFatturatoMese = {
@@ -132,19 +132,25 @@ $(document).ready(function () {
     }
 
     function chartJsVendite(lables, fatturatoMese) {     // funzione che serve per creare grafico delle vendite di ogni mese dell'anno 2017 grazie a chart js
-        var chartSalesX = $('#fatturato-mese-2017');
-        var chartSales = new Chart(chartSalesX, {
-            type: 'line',
-            data: {
-                labels: lables,
-                datasets: [{
-                    label: 'Vendite Mese per Mese 2017',
-                    backgroundColor: '#2E4691',
-                    borderColor: '#2E4691',
-                    data: fatturatoMese
-                }]
-            }
-        });
+        if ($.isEmptyObject(chartSales)) {
+            var chartSalesX = $('#fatturato-mese-2017');
+            var chartSales = new Chart(chartSalesX, {
+                type: 'line',
+                data: {
+                    labels: lables,
+                    datasets: [{
+                        label: 'Vendite Mese per Mese 2017',
+                        backgroundColor: '#2E4691',
+                        borderColor: '#2E4691',
+                        data: fatturatoMese
+                    }]
+                }
+            });
+        } else {
+            chartSales.data.labels = lables;
+            chartSales.data.datasets[0].data = fatturatoMese;
+            chartSales.update();
+        }
     }
     // fine grafico 1
 
@@ -181,33 +187,42 @@ $(document).ready(function () {
     }
 
     function chartJsVenditoriPercentuale(venditori, percentualeFatturatoVenditore) {    // funzione che serve per creare grafico delle vendite di ogni venditore dell'anno 2017 grazie a chart js
-        var ctx = $('#fatturato-venditori-2017');
-        var myPieChart = new Chart(ctx, {
-            type: 'pie',
-            data: {
-                datasets: [{
-                    data: percentualeFatturatoVenditore,
-                    backgroundColor: ['#309FDB', '#E95B54', '#FBCE4A', '#3CAF85']
-                }],
-                labels: venditori
-            },
-            options: {
-                legend: {
-                    position: 'right'
+        if ($.isEmptyObject(myPieChart)) {
+            var ctx = $('#fatturato-venditori-2017');
+            var myPieChart = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    datasets: [{
+                        data: percentualeFatturatoVenditore,
+                        backgroundColor: ['#309FDB', '#E95B54', '#FBCE4A', '#3CAF85']
+                    }],
+                    labels: venditori
                 },
-                title: {
-                    display: true,
-                    text: 'Vendite di ogni venditore rispetto al totale (Espresse in percentuale %)'
-                },
-                tooltips: {
-                    callbacks: {
-                        label: function(tooltipItem, data) {
-                            return data['labels'][tooltipItem['index']] + ': ' + data['datasets'][0]['data'][tooltipItem['index']] + '%';
+                options: {
+                    legend: {
+                        position: 'right'
+                    },
+                    title: {
+                        display: true,
+                        text: 'Vendite di ogni venditore rispetto al totale (Espresse in percentuale %)'
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                return data['labels'][tooltipItem['index']] + ': ' + data['datasets'][0]['data'][tooltipItem['index']] + '%';
+                            }
                         }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            myPieChart.data.labels = venditori;
+            myPieChart.data.datasets[0].data = percentualeFatturatoVenditore;
+            myPieChart.update();
+        }
+
+
+
     }
     // fine grafico 2
 
@@ -233,19 +248,25 @@ $(document).ready(function () {
     }
 
     function chartJsFatturatoQuarter(fatturatoQuarter) {    // questa funzione crea il grafico del fatturato per quarter grazie a chartjs
-        var ctx1 = $('#fatturato-quarters-2017');
-        var myBarChart = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: ['Q1', 'Q2', 'Q3', 'Q4'],
-                datasets: [{
-                    label: 'Fatturato per Quarter 2017',
-                    backgroundColor: '#2E4691',
-                    borderColor: '#2E4691',
-                    data: fatturatoQuarter
-                }]
-            }
-        });
+        if ($.isEmptyObject(myBarChart)) {
+            var ctx1 = $('#fatturato-quarters-2017');
+            var myBarChart = new Chart(ctx1, {
+                type: 'bar',
+                data: {
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                    datasets: [{
+                        label: 'Fatturato per Quarter 2017',
+                        backgroundColor: '#2E4691',
+                        borderColor: '#2E4691',
+                        data: fatturatoQuarter
+                    }]
+                }
+            });
+        } else {
+            myBarChart.data.datasets[0].data = fatturatoQuarter;
+            myBarChart.update();
+        }
+
     }
     // fine grafico 3
 
@@ -292,13 +313,7 @@ $(document).ready(function () {
     }
 
 
-    function removeCanvasAndSalesman() {       // svuota il contenitore dei canvas e ricrea i canvas, svuota la lista dei venditori
-        $('.container').empty();
-        $('.container1').empty();
-
-        $('.container').append('<canvas id="fatturato-mese-2017"></canvas><canvas id="fatturato-venditori-2017"></canvas>');
-        $('.container1').append('<canvas id="fatturato-quarters-2017"></canvas>');
-
+    function removeSalesman() {       // svuota la lista dei venditori
         $('.venditore-select option').not(':first').remove();
     }
 
